@@ -30,9 +30,11 @@ namespace JsonSerializer.Data
             return result;
         }
 
-        private static List<KeyValuePair<string, JToken>> GetJsonProperties(String json, int start, int end)
+        private static Dictionary<string, JToken> GetJsonProperties(String json, int start, int end)
         {
-            List<KeyValuePair<string, JToken>> answers = new List<KeyValuePair<string, JToken>>();
+            Dictionary<string, JToken> answers = new Dictionary<string, JToken>();
+
+            return answers;
         }
     }
 }
