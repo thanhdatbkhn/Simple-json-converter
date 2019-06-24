@@ -10,13 +10,16 @@ namespace JsonSerializer
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
-            string s = "123456";
-            JToken j_token = (JToken)s;
-            string s1 = j_token;
-            float f = 124.5243423f;
-            int i = (int)f; 
+            TestParse1();
             Console.ReadLine();
+        }
+
+        public static void TestParse1()
+        {
+            string json = " {'a':[1,2,3,4,'5']}";
+            var obj = JToken.Parse(json);
+
+            Console.WriteLine($"json: {obj.ToString()}");
         }
     }
 }
