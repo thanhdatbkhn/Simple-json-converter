@@ -58,7 +58,7 @@ namespace JsonSerializer.Data
                 indexPointer = endProperty;
 
                 if (!json.TryNextChar(indexPointer, out indexPointer))
-                    throw ExceptionHelpers.MakeJsonErrorException(json, start);
+                    throw ExceptionHelpers.MakeJsonErrorException(json, indexPointer);
 
                 int nextCharIndex;
                 var nextChar = json.FindCharNotIsSpaceFollowByIndex(indexPointer, out nextCharIndex);
@@ -121,7 +121,7 @@ namespace JsonSerializer.Data
         {
             for (int i = start; i < json.Length; i++)
             {
-                var c = json[start];
+                var c = json[i];
                 if (' '.Equals(c))
                 {
                     continue;

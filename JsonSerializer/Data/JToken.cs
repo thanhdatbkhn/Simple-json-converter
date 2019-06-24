@@ -64,7 +64,7 @@ namespace JsonSerializer.Data
                 }
                 else if (json.HasStringFollowByIndex("null", i))
                 {
-                    answer = null;
+                    answer = new JValue(null);
                     endIndex = i + 3;
                     break;
                 }

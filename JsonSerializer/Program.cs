@@ -3,6 +3,7 @@ using System.Threading;
 using System.Collections;
 using System.Collections.Generic;
 using JsonSerializer.Data;
+using System.Diagnostics;
 
 namespace JsonSerializer
 {
@@ -10,7 +11,12 @@ namespace JsonSerializer
     {
         static void Main(string[] args)
         {
-            TestParse1();
+            while (true)
+            {
+                var cmd = Console.ReadLine();
+                TestParse3(cmd);
+                TestParse2(cmd);
+            }
             Console.ReadLine();
         }
 
@@ -20,6 +26,35 @@ namespace JsonSerializer
             var obj = JToken.Parse(json);
 
             Console.WriteLine($"json: {obj.ToString()}");
+        }
+
+        public static void TestParse2(string json)
+        {
+            //string json = "{'a':[1,2,3,4,'5'], 'b': null}";
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+            //for (int i = 0; i < 1000; i++)
+            //{
+            json = json;
+            var obj = JToken.Parse(json);
+            //}
+            stopwatch.Stop();
+            Console.WriteLine($"1000 times json parse: {stopwatch.Elapsed}");
+            Console.WriteLine($"json parse: {obj.ToString()}");
+        }
+
+        public static void TestParse3(string json)
+        {
+            //string json = "{'a':[1,2,3,4,'5'], 'b': null}";
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+            //for (int i = 0; i < 1000; i++)
+            //{
+            json = json;
+            var obj = Newtonsoft.Json.Linq.JObject.Parse(json);
+            //}
+            stopwatch.Stop();
+            Console.WriteLine($"1000 times json parse: {stopwatch.Elapsed}");
         }
     }
 }

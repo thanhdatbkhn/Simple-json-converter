@@ -4,7 +4,7 @@ using System.Text;
 
 namespace JsonSerializer.Data
 {
-    public class JValue :JToken
+    public class JValue : JToken
     {
         internal object m_data;
 
@@ -96,18 +96,20 @@ namespace JsonSerializer.Data
                 sb.Append("null");
                 return sb.ToString();
             }
-
-            if (m_data is string)
+            else if (m_data is string)
             {
-                sb.Append("\"");
+                sb.Append('"');
                 sb.Append(m_data);
-                sb.Append("\"");
+                sb.Append('"');
+            }
+            else if (m_data is Boolean)
+            {
+                sb.Append(m_data.ToString().ToLower());
             }
             else
             {
                 sb.Append(m_data.ToString());
             }
-
             return sb.ToString();
         }
     }
