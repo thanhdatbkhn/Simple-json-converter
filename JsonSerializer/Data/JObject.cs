@@ -85,12 +85,79 @@ namespace JsonSerializer.Data
             return result;
         }
 
+        internal new static JObject Parse(JsonStream jsonStream)
+        {
+            jsonStream.MoveToNextContent();
+            if (!'{'.Equals(jsonStream.CurrentChar))
+                throw ExceptionHelpers.MakeJsonErrorException(jsonStream);
+            List<KeyValuePair<string, JToken>> properties = new List<KeyValuePair<string, JToken>>();
+
+            jsonStream.Move();
+            jsonStream.MoveToNextContent();
+
+            if (jsonStream.IsStartOfString())
+            {
+                while (true)
+                {
+                    var prop = GetNextProperty(jsonStream);
+                    properties.Add(prop);
+
+                    jsonStream.MoveToNextContent();
+                    if (','.Equals(jsonStream.CurrentChar))
+                    {
+                        jsonStream.Move();
+                        jsonStream.MoveToNextContent();
+                        if (jsonStream.IsStartOfString())
+                        {
+                            continue;
+                        }
+                        else if ('}'.Equals(jsonStream.CurrentChar))
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            throw ExceptionHelpers.MakeJsonErrorException(jsonStream);
+                        }
+                    }
+                    else if ('}'.Equals(jsonStream.CurrentChar))
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        throw ExceptionHelpers.MakeJsonErrorException(jsonStream);
+                    }
+                }
+            }
+            else if(!'}'.Equals(jsonStream.CurrentChar))
+            {
+                throw ExceptionHelpers.MakeJsonErrorException(jsonStream);
+            }
+
+            jsonStream.Move();
+            var answer = new JObject();
+            answer.m_items = new Dictionary<string, JToken>(properties);
+            return answer;
+        }
+
         private static bool IsEndObject(string json, int start, out int endIndex)
         {
             int nextCharIndex;
             endIndex = start;
             var nextChar = json.FindCharNotIsSpaceFollowByIndex(start, out nextCharIndex);
             return nextCharIndex != -1 && '}'.Equals(nextChar);
+        }
+
+        private static KeyValuePair<String, JToken> GetNextProperty(JsonStream jsonStream)
+        {
+            var propName = jsonStream.MoveBehindStringAndGet();
+            jsonStream.MoveToNextContent();
+            if (!':'.Equals(jsonStream.CurrentChar))
+                throw ExceptionHelpers.MakeJsonErrorException(jsonStream);
+            jsonStream.Move();
+            var propValue = JToken.Parse(jsonStream);
+            return new KeyValuePair<string, JToken>(propName, propValue);
         }
 
         private static KeyValuePair<String, JToken> GetNextProperty(string json, int start, out int endIndex)

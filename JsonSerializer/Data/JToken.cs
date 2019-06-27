@@ -26,7 +26,16 @@ namespace JsonSerializer.Data
             return answer;
         }
 
-        protected static JToken Parse(string json, int start, out int endIndex)
+        public static JToken ParseNew(string json)
+        {
+            var jsonStream = new JsonStream(json);
+            var answer = Parse(jsonStream);
+            if (jsonStream.HasNextContent())
+                throw ExceptionHelpers.MakeJsonErrorException(jsonStream);
+            return answer;
+        }
+
+        internal static JToken Parse(string json, int start, out int endIndex)
         {
             JToken answer = null;
             endIndex = start;
@@ -85,6 +94,26 @@ namespace JsonSerializer.Data
                     throw ExceptionHelpers.MakeJsonErrorException(json, i);
                 }
             }
+            return answer;
+        }
+
+        protected static JToken Parse(JsonStream jsonStream)
+        {
+            JToken answer;
+            var contentChar = jsonStream.MoveToNextContent();
+            switch (contentChar)
+            {
+                case '{':
+                    answer = JObject.Parse(jsonStream);
+                    break;
+                case '[':
+                    answer = JArray.Parse(jsonStream);
+                    break;
+                default:
+                    answer = JValue.Parse(jsonStream);
+                    break;
+            }
+
             return answer;
         }
 

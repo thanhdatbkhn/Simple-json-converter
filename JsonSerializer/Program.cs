@@ -14,7 +14,9 @@ namespace JsonSerializer
             while (true)
             {
                 var cmd = Console.ReadLine();
-                TestParse3(cmd);
+                //TestParse3(cmd);
+                
+                TestParse4(cmd);
                 TestParse2(cmd);
             }
             Console.ReadLine();
@@ -22,7 +24,7 @@ namespace JsonSerializer
 
         public static void TestParse1()
         {
-            string json = " {'a':[1,2,3,4,'5']}";
+            string json = "{'a':[1,2,3,4,'5'],\n 'b': null}";
             var obj = JToken.Parse(json);
 
             Console.WriteLine($"json: {obj.ToString()}");
@@ -54,7 +56,20 @@ namespace JsonSerializer
             var obj = Newtonsoft.Json.Linq.JObject.Parse(json);
             //}
             stopwatch.Stop();
-            Console.WriteLine($"1000 times json parse: {stopwatch.Elapsed}");
+            Console.WriteLine($"1000 times Newtonsoft json parse: {stopwatch.Elapsed}");
+        }
+
+        public static void TestParse4(string json)
+        {
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+            //for (int i = 0; i < 1000; i++)
+            //{
+            json = json;
+            var obj = JToken.ParseNew(json);
+            //}
+            stopwatch.Stop();
+            Console.WriteLine($"1000 times json parse new: {stopwatch.Elapsed}");
         }
     }
 }

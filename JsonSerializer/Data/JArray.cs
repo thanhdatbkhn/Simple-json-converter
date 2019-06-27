@@ -2,16 +2,22 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 
 namespace JsonSerializer.Data
 {
     public class JArray : JToken
     {
         private JToken[] m_items;
-        public JArray(JToken[] array)
+        public JArray(JToken[] items)
         {
-            m_items = new JToken[array.Length];
-            Array.Copy(array, 0, m_items, 0, array.Length);
+            m_items = new JToken[items.Length];
+            Array.Copy(items, 0, m_items, 0, items.Length);
+        }
+
+        public JArray(IEnumerable<JToken> items)
+        {
+            m_items = items.ToArray();
         }
 
         //public new static JArray Parse(string json)
@@ -68,6 +74,45 @@ namespace JsonSerializer.Data
             return new JArray(items.ToArray());
         }
 
+        internal new static JArray Parse(JsonStream jsonStream)
+        {
+            jsonStream.MoveToNextContent();
+            if (!'['.Equals(jsonStream.CurrentChar))
+                throw ExceptionHelpers.MakeJsonErrorException(jsonStream);
+
+            jsonStream.Move();
+            jsonStream.MoveToNextContent();
+
+            List<JToken> values = new List<JToken>();
+
+            if (!']'.Equals(jsonStream.CurrentChar))
+            {
+                while (true)
+                {
+                    var value = JToken.Parse(jsonStream);
+                    values.Add(value);
+                    jsonStream.MoveToNextContent();
+                    if (','.Equals(jsonStream.CurrentChar))
+                    {
+                        jsonStream.Move();
+                        jsonStream.MoveToNextContent();
+                        if (']'.Equals(jsonStream.CurrentChar))
+                        {
+                            break;
+                        }
+                    }
+                    else if (']'.Equals(jsonStream.CurrentChar))
+                    {
+                        break;
+                    }
+                }
+            }
+
+            jsonStream.Move();
+            var answer = new JArray(values);
+            return answer;
+        }
+
         private static bool IsEndArray(string json, int start, out int endIndex)
         {
             int nextCharIndex;
@@ -76,7 +121,7 @@ namespace JsonSerializer.Data
             return nextCharIndex != -1 && ']'.Equals(nextChar);
         }
 
-        public JToken this[int index] 
+        public JToken this[int index]
         {
             get
             {

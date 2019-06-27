@@ -83,6 +83,64 @@ namespace JsonSerializer.Data
             return new JValue(s);
         }
 
+        internal new static JValue Parse(JsonStream jsonStream)
+        {
+            JValue answer;
+            switch (jsonStream.CurrentChar)
+            {
+                case 'n':
+                    if (jsonStream.HasNullFollow())
+                    {
+                        answer = new JValue(null);
+                        jsonStream.MoveBehindNull();
+                    }
+                    else
+                    {
+                        throw ExceptionHelpers.MakeJsonErrorException(jsonStream);
+                    }
+                    break;
+                case 't':
+                    if (jsonStream.HasTrueFollow())
+                    {
+                        answer = (JValue)true;
+                        jsonStream.MoveBehindTrue();
+                    }
+                    else
+                    {
+                        throw ExceptionHelpers.MakeJsonErrorException(jsonStream);
+                    }
+                    break;
+                case 'f':
+                    if (jsonStream.HasFalseFollow())
+                    {
+                        answer = (JValue)false;
+                        jsonStream.MoveBehindFalse();
+                    }
+                    else
+                    {
+                        throw ExceptionHelpers.MakeJsonErrorException(jsonStream);
+                    }
+                    break;
+                default:
+                    if (jsonStream.IsStartOfString())
+                    {
+                        var content = jsonStream.MoveBehindStringAndGet();
+                        answer = (JValue)content;
+                    }
+                    else if (jsonStream.IsStartOfNumber())
+                    {
+                        var number = jsonStream.MoveBehindNumberAndGet();
+                        answer = (JValue)double.Parse(number);
+                    }
+                    else
+                    {
+                        throw ExceptionHelpers.MakeJsonErrorException(jsonStream);
+                    }
+                    break;
+            }
+            return answer;
+        }
+
         public override string ToString()
         {
             return ToString(true);
